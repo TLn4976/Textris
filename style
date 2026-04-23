@@ -1,0 +1,23 @@
+*{box-sizing: content-box}
+Header{color: $secondary}
+#p{layer: above; background: $success; height: 100%; width: 100%; content-align: center middle; color: $background; text-style: bold; text-overflow: clip; text-wrap: nowrap}
+#q{hatch: cross $error 10%; align: center middle;width:60;height:30;outline:heavy $success-muted; layer:below}
+#scr{align: center middle; layers: below above}
+Tetris{width:auto;height:auto;background:$surface}
+Grid{grid-rows: 1; grid-columns: 2}
+#Board{border: round $accent; height: auto; width: auto}
+#NextPiece{border: round $accent; margin: 1 0 1 4; width: auto; height: auto}
+ScoreDisp{border: round $accent; width: auto; height: auto; color: $primary}
+#info{width: auto; height: 22; padding: 0 1 0 1}
+#blft,#brgt{color: $background; max-width: 5; height: 4}
+#brot{color: $background; max-width: 5; max-height: 3}
+#bdrp{color: $background; max-width: 5; max-height: 3}
+#updn{max-width: 6; max-height: 6}
+.c0{color: $boost}
+.c1{color: $primary; background: $primary-muted}
+.c2{color: $success; background: $success-muted}
+.c3{color: $accent; background: $accent-muted}
+.c4{color: #7bd; background: #7bd 25%}
+.c5{color: #eb0; background: #eb0 25%}
+.c6{color: $warning; background: $warning-muted}
+.c7{color: #9b3; background: #9b3 25%}

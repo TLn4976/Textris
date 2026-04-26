@@ -123,7 +123,8 @@ class MainApp(App):
         self.g.movDir = 0
 
     def action_hdDrp(self):
-        self.g.hardDrop()
+        if not self.g.locked:
+            self.g.hardDrop()
 
     def action_rot(self):
         self.g.rot = True
@@ -195,6 +196,7 @@ class Tetris(Horizontal):
     nType = 7
     pVar = 0
     pos = reactive([0, 3])
+    gPos = [0,0]
     movDir = reactive(-1)
     dLayer = [[int(j > 20) * -1 for _ in range(10)] for j in range(22)]
     rot = reactive(False)
@@ -237,8 +239,8 @@ class Tetris(Horizontal):
             i.append(0)
         self.NextPiece.rendBoard(nPiece)
 
-    def hardDrop(self):
-        if not self.locked and not self.gameover:
+    def hardDrop(self, mov = True):
+        if not self.gameover:
             tPos = self.pos.copy()
             addscore = 0
             tCoords = self.getCoords(self.pType, self.pVar, tPos)
@@ -250,8 +252,10 @@ class Tetris(Horizontal):
             tPos[0] -= 1
             addscore -= 2
             self.scoreDisp.addsc(addscore)
-            self.pos = tPos
-            self.movDir = 1
+            if mov:
+                self.pos = tPos
+                self.movDir = 1
+            return tPos
 
     def tryMove(self, dire, var, doMov=1):
         oob = False
@@ -307,11 +311,7 @@ class Tetris(Horizontal):
             self.rCleared += a
             if a == 4:
                 self.Board.border_subtitle = str(self.Board.border_subtitle) + "Tetris!"
-
-                def t1():
-                    self.Board.border_subtitle = ""
-
-                self.set_timer(2, t1)
+                self.set_timer(2, lambda: setattr(self.Board, "border_subtitle", ""))
             if self.rCleared > 6:
                 self.post_message(self.Blink([255, 204, 0], 0.5, "out_quint"))
                 self.rCleared -= 7
@@ -321,6 +321,8 @@ class Tetris(Horizontal):
 
     def updateDisp(self):
         temp = [r[:] for r in self.dLayer]
+        for r, u in self.getCoords(self.pType, self.pVar, self.hardDrop(False)):
+            temp[r][u] = 8
         for r, u in self.getCoords(self.pType, self.pVar, self.pos):
             temp[r][u] = self.pType + 1
         self.Board.rendBoard(temp[1:])
@@ -398,15 +400,13 @@ class Tetris(Horizontal):
             self.rot = False
 
     def watch_level(self):
-        def t1():
-            self.Board.border_subtitle = ""
-
         self.Board.border_title = f"LEVEL {self.level}"
         if self.level > 1:
             self.Board.border_subtitle = str(self.Board.border_subtitle) + "Level Up!"
             self.drptimer.stop()
             self.drptimer = self.set_interval(0.85 / 1.1 ** (self.level - 1), self.drp1)
-            self.set_timer(2, t1)
+            self.set_timer(2, lambda: setattr(self.Board, "border_subtitle", ""))
+
 
     def watch_pos(self):
         self.updateDisp()

@@ -21,3 +21,4 @@ ScoreDisp{border: round $accent; width: auto; height: auto; color: $primary}
 .c5{color: #eb0; background: #eb0 25%}
 .c6{color: $warning; background: $warning-muted}
 .c7{color: #9b3; background: #9b3 25%}
+.c8{color: $text 8%; background: $panel}

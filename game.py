@@ -156,7 +156,7 @@ class MainApp(App):
                 pass
 
     def on_mount(self):
-        self.theme = "rose-pine-moon"
+        self.theme = "rose-pine-dawn"
         self.g = self.query_one(Tetris)
         self.p = self.query_one("#p")
 
@@ -179,8 +179,6 @@ class MainApp(App):
 
 class Tetris(Horizontal):
     # COORDINATES: [ROW, COLUMN]
-    ROWS = 20
-    COLS = 10
     PIECES = [
         [0x4E00, 0x4640, 0x0E40, 0x4C40, 0x0270],  # T
         [0x2E00, 0x4460, 0x0E80, 0xC440, 0x0170],  # L
@@ -245,11 +243,11 @@ class Tetris(Horizontal):
             tCoords = self.getCoords(self.pType, self.pVar, tPos)
             while not self.collide(tCoords):
                 tPos[0] += 1
-                addscore += 2
+                addscore += 2 if mov else 0
                 for i in tCoords:
                     i[0] += 1
             tPos[0] -= 1
-            addscore -= 2
+            addscore -= 2 if mov else 0
             self.scoreDisp.addsc(addscore)
             if mov:
                 self.pos = tPos
@@ -262,18 +260,18 @@ class Tetris(Horizontal):
         b = 0
         match dire:
             case 0:
-                tPos = [pos[0], pos[1] - 1]
+                tPos = [pos[0], pos[1] - 1] #LEFT
             case 1:
-                tPos = [pos[0] + 1, pos[1]]
+                tPos = [pos[0] + 1, pos[1]] #DOWN
             case 4:
-                tPos = [pos[0] + 1, pos[1]]
+                tPos = [pos[0] + 1, pos[1]] #DOWN, MANUALLY
                 self.scoreDisp.addsc(1)
             case 2:
-                tPos = [pos[0] - 1, pos[1]]
+                tPos = [pos[0] - 1, pos[1]] #UP
             case 3:
-                tPos = [pos[0], pos[1] + 1]
-            case _:
-                tPos = pos
+                tPos = [pos[0], pos[1] + 1] #RIGHT
+            case _: 
+                tPos = pos #DOES NOT MOVE
         tCoords = self.getCoords(self.pType, var, tPos)
         for i in tCoords:
             if i[0] < 0 or i[0] > 21 or i[1] < 0 or i[1] > 9:
@@ -294,21 +292,17 @@ class Tetris(Horizontal):
         self.set_interval(0.15, self.clearRows, repeat=1)
 
     def clearRows(self):
-        a = 0
+        rCleared = 0
         for r in self.dLayer:
-            space = 0
-            for i in r:
-                if i < 1:
-                    space += 1
-            if not space:
+            if not any(i < 1 for i in r):
                 self.dLayer.pop(self.dLayer.index(r))
                 self.dLayer.insert(0, [0 for _ in range(10)])
-                a += 1
-        if a:
+                rCleared += 1
+        if rCleared:
             self.updateDisp()
-            self.scoreDisp.addsc(2**a * 50)
-            self.rCleared += a
-            if a == 4:
+            self.scoreDisp.addsc(2**rCleared * 50)
+            self.rCleared += rCleared
+            if rCleared == 4:
                 self.Board.border_subtitle = str(self.Board.border_subtitle) + "Tetris!"
                 self.set_timer(2, lambda: setattr(self.Board, "border_subtitle", ""))
             if self.rCleared > 6:
@@ -405,7 +399,6 @@ class Tetris(Horizontal):
             self.drptimer.stop()
             self.drptimer = self.set_interval(0.85 / 1.1 ** (self.level - 1), self.drp1)
             self.set_timer(2, lambda: setattr(self.Board, "border_subtitle", ""))
-
 
     def watch_pos(self):
         self.updateDisp()

@@ -196,7 +196,6 @@ class Tetris(Horizontal):
     nType = 7
     pVar = 0
     pos = reactive([0, 3])
-    gPos = [0,0]
     movDir = reactive(-1)
     dLayer = [[int(j > 20) * -1 for _ in range(10)] for j in range(22)]
     rot = reactive(False)
